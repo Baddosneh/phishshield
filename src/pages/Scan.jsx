@@ -123,19 +123,19 @@ const Scan = () => {
             <Mail className="w-6 h-6 text-blue-400" />
             Email Scan
           </h3>
-          <div className="flex gap-2">
-            <textarea
-              value={emailInput}
-              onChange={e => setEmailInput(e.target.value)}
-              placeholder="Paste suspicious email content here..."
-              className="flex-1 bg-white/5 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 resize-y min-h-[100px]"
-              required
-            />
+          <div className="flex flex-col sm:flex-row gap-2">
+              <textarea
+                value={emailInput}
+                onChange={e => setEmailInput(e.target.value)}
+                placeholder="Paste suspicious email content here..."
+                className="flex-1 bg-white/5 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 resize-y min-h-[100px]"
+               required
+             />
             <button
-              type="submit"
-              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition"
-              disabled={loadingEmail}
-            >
+                type="submit"
+                className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition"
+                disabled={loadingEmail}
+             >
               {loadingEmail ? 'Scanning...' : 'Scan'}
             </button>
           </div>
@@ -147,21 +147,21 @@ const Scan = () => {
             <Shield className="w-6 h-6 text-blue-400" />
             URL Scan
           </h3>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
-              type="text"
-              value={urlInput}
-              onChange={e => setUrlInput(e.target.value)}
+             type="text"
+             value={urlInput}
+             onChange={e => setUrlInput(e.target.value)}
               placeholder="Paste a suspicious URL here..."
               className="flex-1 bg-white/5 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
               required
-            />
+             />
             <button
               type="submit"
               className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition"
               disabled={loadingUrl}
-            >
-              {loadingUrl ? 'Scanning...' : 'Scan'}
+             > 
+             {loadingUrl ? 'Scanning...' : 'Scan'}
             </button>
           </div>
         </form>

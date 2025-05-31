@@ -66,7 +66,7 @@ const getUserEmail = () => {
 const handlePaystackInit = async (plan) => {
   try {
     const token = localStorage.getItem("token");
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/initialize`, {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/paystack/initialize`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
