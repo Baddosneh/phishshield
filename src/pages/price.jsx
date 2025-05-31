@@ -73,7 +73,7 @@ const handlePaystackInit = async (plan) => {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        amount: plan.ghsAmount / 100, // send amount in GHS
+        amount: plan.priceGHS, // send amount in GHS
         email: getUserEmail(),
         plan: plan.name,
       }),

@@ -78,9 +78,20 @@ const Dashboard = () => {
   const [analyzedGmailEmails, setAnalyzedGmailEmails] = useState([]); 
   const [loadingGmailEmails, setLoadingGmailEmails] = useState(false);
   const [gmailEmailsError, setGmailEmailsError] = useState('');
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  if (params.get('payment') === 'success') {
+    setPaymentSuccess(true);
+    // Optionally, refetch user info here to update plan status
+    window.history.replaceState({}, document.title, location.pathname);
+    }
+    }, [location]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -523,6 +534,12 @@ const Dashboard = () => {
             </div>
           </div>
         )}
+        {paymentSuccess && (
+         <div className="bg-green-100 text-green-700 rounded-lg p-4 mb-4 flex items-center gap-2">
+           <CheckCircle className="w-5 h-5" />
+           Payment successful! Your premium plan is now active.
+         </div>
+         )}
       </div>
     </div>
   );
