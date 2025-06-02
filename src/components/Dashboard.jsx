@@ -18,11 +18,21 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 const scanTypeIcon = (type) => {
   if (type === 'email') return <Mail className="w-6 h-6 text-blue-400" title="Email" />;
   if (type === 'url') return <LinkIcon className="w-6 h-6 text-purple-400" title="URL" />;
+  if (type === 'sms') return <Smartphone className="w-6 h-6 text-green-400" title="SMS" />;
   return <Shield className="w-6 h-6 text-gray-400" />;
 };
 
+
 // Helper: Icon for result status
 const statusIcon = (type, prediction, confidence) => {
+
+  if (type === 'sms') {
+    if (prediction === 'spam') return <AlertTriangle className="w-6 h-6 text-yellow-400" title="Spam" />;
+    if (prediction === 'ham') return <CheckCircle className="w-6 h-6 text-green-400" title="Legitimate" />;
+    if (confidence < 0.6) return <AlertTriangle className="w-6 h-6 text-yellow-400" title="Uncertain" />;
+    return <CheckCircle className="w-6 h-6 text-green-400" title="Legitimate" />;
+  }
+
   if (type === 'url') {
     if (prediction === 'malware') {
       return <AlertTriangle className="w-6 h-6 text-yellow-400" title="Phishing" />;
@@ -56,6 +66,12 @@ const getResultLabel = (type, prediction, confidence) => {
     if (prediction === 'benign') return 'Legitimate';
     if (prediction && prediction.includes('phishing')) return 'Phishing';
     if (confidence < 0.6) return 'Phishing';
+    return 'Legitimate';
+  }
+  if (type === 'sms') {
+    if (prediction === 'spam') return 'Spam';
+    if (prediction === 'ham') return 'Legitimate';
+    if (confidence < 0.6) return 'Spam';
     return 'Legitimate';
   }
   return prediction === 'phishing' ? 'Phishing' : 'Legitimate';
@@ -400,29 +416,33 @@ const Dashboard = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {history.map((item, idx) => {
-                        const type = item.scanType;
-                        const prediction = item.results?.prediction;
+                     {history.map((item, idx) => {
+                      const type = item.scanType;
+                       const prediction = item.results?.prediction;
                         const confidence = item.results?.confidence;
                         const resultLabel = getResultLabel(type, prediction, confidence);
                         return (
-                          <tr key={item._id || idx} className="border-b border-white/10 hover:bg-white/10 transition">
-                            <td className="px-6 py-3  items-center gap-2">
-                              {scanTypeIcon(type)}
-                              <span className="capitalize text-white">{type}</span>
+                        <tr key={item._id || idx} className="border-b border-white/10 hover:bg-white/10 transition">
+                           <td className="px-6 py-3 items-center gap-2">
+                             {scanTypeIcon(type)}
+                             <span className="capitalize text-white">{type}</span>
                             </td>
                             <td className="px-6 py-3 flex items-center gap-2">
-                              {statusIcon(type, prediction, confidence)}
-                              <span className={resultLabel === 'Phishing' ? 'text-yellow-300 font-semibold' : 'text-green-300 font-semibold'}>
-                                {resultLabel}
-                              </span>
+                                {statusIcon(type, prediction, confidence)}
+                                <span className={
+                                   resultLabel === 'Phishing' || resultLabel === 'Spam'
+                                 ? 'text-yellow-300 font-semibold'
+                                  : 'text-green-300 font-semibold'
+                                  }>
+                                 {resultLabel}
+                                </span>
                             </td>
-                            <td className="px-6 py-3 text-gray-300">
-                              {formatDate(item.createdAt || item.results?.createdAt || item.date)}
-                            </td>
-                          </tr>
+                             <td className="px-6 py-3 text-gray-300">
+                               {formatDate(item.createdAt || item.results?.createdAt || item.date)}
+                             </td>
+                        </tr>
                         );
-                      })}
+                       })}
                     </tbody>
                   </table>
                 </div>

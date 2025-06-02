@@ -8,6 +8,7 @@ import ResultsModal from '../components/ResultsModal';
 const Scan = () => {
   const [emailInput, setEmailInput] = useState('');
   const [urlInput, setUrlInput] = useState('');
+  const [smsInput, setSmsInput] = useState('')
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Scan = () => {
   // Separate loading states
   const [loadingEmail, setLoadingEmail] = useState(false);
   const [loadingUrl, setLoadingUrl] = useState(false);
+  const [loadingSms, setLoadingSms] = useState(false);
   const [modalScanType, setModalScanType] = useState('email');
 
   // Email scan
@@ -109,6 +111,50 @@ const Scan = () => {
     }
   };
 
+  const handleSmsScan = async (e) => {
+    e.preventDefault();
+    setLoadingSms(true);
+    setError(null);
+    setResults(null);
+
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/scan/sms`,
+        { input: smsInput },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+      setResults(response.data);
+      setModalScanType('sms');
+      setModalOpen(true);
+    } catch (err) {
+
+      if (err.response && err.response.status === 403) {
+         
+        navigate('/pricing');
+      }
+      if (err.response) {
+        setError(
+          err.response.data?.error ||
+          JSON.stringify(err.response.data) ||
+          'An error occurred while scanning the sms.'
+        );
+      } else if (err.request) {
+        setError('No response received from server.');
+      } else {
+        setError('An unexpected error occurred: ' + err.message);
+      }
+    } finally {
+      setLoadingSms(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 py-20">
       <div className="container mx-auto px-4 max-w-3xl">
@@ -141,6 +187,31 @@ const Scan = () => {
           </div>
         </form>
 
+        {/* sms Scan Section */}
+        <form onSubmit={handleSmsScan} className="bg-white/10 rounded-lg p-6 mb-6">
+          <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+            <Mail className="w-6 h-6 text-blue-400" />
+            SMS Scan
+          </h3>
+          <div className="flex flex-col sm:flex-row gap-2">
+              <textarea
+                value={smsInput}
+                onChange={e => setSmsInput(e.target.value)}
+                placeholder="Paste suspicious sms content here..."
+                className="flex-1 bg-white/5 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 resize-y min-h-[100px]"
+               required
+             />
+            <button
+                type="submit"
+                className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition"
+                disabled={loadingSms}
+             >
+              {loadingSms ? 'Scanning...' : 'Scan'}
+            </button>
+          </div>
+        </form>
+
+        
         {/* URL Scan Section */}
         <form onSubmit={handleUrlScan} className="bg-white/10 rounded-lg p-6 mb-6">
           <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
@@ -165,6 +236,7 @@ const Scan = () => {
             </button>
           </div>
         </form>
+
 
         {/* Results Modal */}
         <ResultsModal
