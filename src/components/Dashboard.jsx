@@ -10,6 +10,7 @@ import {
   Link as LinkIcon,
   Loader2,
   PlusCircle,
+  Smartphone
   
 } from 'lucide-react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
