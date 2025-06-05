@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Shield, Mail, Lock, User } from 'lucide-react';
+import { Shield, Mail, Lock, User, Loader2 } from 'lucide-react'; // Import Loader2
 import { useNavigate } from 'react-router-dom';
 
 const RegisterForm = () => {
@@ -10,34 +10,36 @@ const RegisterForm = () => {
   const [terms, setTerms] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false); // Loading state
   const navigate = useNavigate();
 
-  
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setSuccess('');
-  if (!terms) {
-    setError('You must agree to the terms and privacy policy.');
-    return;
-  }
-  try {
-     const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {      username,
-      email,
-      password,
-    });
-    // Store JWT token if provided
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      navigate('/dashboard');
-    } else {
-      setError('Registration succeeded but no token was returned.');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    if (!terms) {
+      setError('You must agree to the terms and privacy policy.');
+      return;
     }
-  } catch (err) {
-    setError(err.response?.data?.message || 'Registration failed. Please try again.');
-  }
-};
-
+     setLoading(true);
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {
+        username,
+        email,
+        password,
+      });
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        navigate('/dashboard');
+      } else {
+        setError('Registration succeeded but no token was returned.');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -64,6 +66,7 @@ const handleSubmit = async (e) => {
                   onChange={e => setUsername(e.target.value)}
                   className="pl-10 w-full bg-white/5 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
                   placeholder="Username"
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -80,6 +83,7 @@ const handleSubmit = async (e) => {
                   onChange={e => setEmail(e.target.value)}
                   className="pl-10 w-full bg-white/5 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
                   placeholder="Email address"
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -96,11 +100,12 @@ const handleSubmit = async (e) => {
                   onChange={e => setPassword(e.target.value)}
                   className="pl-10 w-full bg-white/5 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
                   placeholder="Password"
+                  disabled={loading}
                 />
               </div>
             </div>
           </div>
-          <div className="flex items-center">
+           <div className="flex items-center">
             <input
               id="terms"
               name="terms"
@@ -109,6 +114,7 @@ const handleSubmit = async (e) => {
               onChange={e => setTerms(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
               required
+              disabled={loading}
             />
             <label htmlFor="terms" className="ml-2 block text-sm text-gray-300">
               I agree to the <a href="/terms" className="text-blue-400 hover:text-blue-300">Terms</a> and <a href="/privacy" className="text-blue-400 hover:text-blue-300">Privacy Policy</a>
@@ -116,9 +122,17 @@ const handleSubmit = async (e) => {
           </div>
           <button
             type="submit"
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={loading}
           >
-            Create Account
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin mr-2 w-5 h-5" />
+                Creating account...
+              </>
+            ) : (
+              "Create Account"
+            )}
           </button>
         </form>
       </div>
